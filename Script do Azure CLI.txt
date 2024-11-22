@@ -1,0 +1,20 @@
+-- Para logar na conta correta:
+az account list
+
+az account set --subscription "rm99977 -Azure para Estudantes"
+
+
+-- Criando grupo de recursos,serviço de aplicativo e plano de serviço de aplicativo:
+
+## Variaveis do Script
+rg=rg-app-EnergyMI &&
+location=brazilsouth &&
+appServicePlanName=plan-app-EnergyMI &&
+webAppName=app-EnergyMI &&
+sku=F1 &&
+## Cria um novo Grupo de Recursos
+az group create --name $rg --location $location &&
+## Cria um novo Plano de Serviço para o App
+az appservice plan create -n $appServicePlanName --location $location -g $rg --sku $sku &&
+## Cria um novo Serviço de Aplicativo
+az webapp create -g $rg -p $appServicePlanName --runtime "Java17" -n $webAppName
