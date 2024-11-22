@@ -1,0 +1,110 @@
+-- --------------------------------------
+-- DROP TABLES (Remover as tabelas)
+-- --------------------------------------
+
+DROP TABLE IF EXISTS tb_alerta;
+DROP TABLE IF EXISTS tb_consumo;
+DROP TABLE IF EXISTS tb_recomendacao;
+DROP TABLE IF EXISTS tb_aparelho;
+DROP TABLE IF EXISTS tb_instalacao;
+DROP TABLE IF EXISTS t_usuario;
+
+-- --------------------------------------
+-- CREATE TABLES 
+-- --------------------------------------
+
+-- Tabela de Instalações
+CREATE TABLE tb_instalacao (
+    cdInstalacao INT IDENTITY(1,1) PRIMARY KEY,  -- Gerador automático de código
+    nmEstado NVARCHAR(50) NOT NULL,
+    nmCidade NVARCHAR(50) NOT NULL,
+    nmBairro NVARCHAR(50) NOT NULL,
+    nmRua NVARCHAR(50) NOT NULL,
+    nrNumeroEndereco INT NOT NULL,
+    dsObservacoes NVARCHAR(250)
+);
+
+-- Tabela de Aparelhos
+CREATE TABLE tb_aparelho (
+    cdAparelho INT IDENTITY(1,1) PRIMARY KEY,   -- Gerador automático de código
+    dsNomeAparelho NVARCHAR(100) NOT NULL,
+    dsTipoAparelho NVARCHAR(250) NOT NULL,
+    nrWatts INT NOT NULL,
+    cdInstalacao INT NOT NULL,
+    CONSTRAINT fk_tb_aparelho_instalacao FOREIGN KEY (cdInstalacao) REFERENCES tb_instalacao(cdInstalacao)
+);
+
+-- Tabela de Consumo
+CREATE TABLE tb_consumo (
+    cdConsumo INT IDENTITY(1,1) PRIMARY KEY,    -- Gerador automático de código
+    dtConsumo DATE NOT NULL,
+    nrConsumoEnergia INT NOT NULL,
+    nrCusto DECIMAL(10, 2) NOT NULL,
+    dsObservacoes NVARCHAR(250),
+    cdAparelho INT NOT NULL,
+    CONSTRAINT fk_tb_consumo_aparelho FOREIGN KEY (cdAparelho) REFERENCES tb_aparelho(cdAparelho)
+);
+
+-- Tabela de Alertas
+CREATE TABLE tb_alerta (
+    cdAlerta INT IDENTITY(1,1) PRIMARY KEY,     -- Gerador automático de código
+    dsObservacao NVARCHAR(100) NOT NULL,
+    stNivelPrioridade NVARCHAR(5) NOT NULL,
+    dtAlerta DATE NOT NULL,
+    cdAparelho INT NOT NULL,
+    CONSTRAINT fk_tb_alerta_aparelho FOREIGN KEY (cdAparelho) REFERENCES tb_aparelho(cdAparelho)
+);
+
+-- Tabela de Recomendações
+CREATE TABLE tb_recomendacao (
+    cdRecomendacao INT IDENTITY(1,1) PRIMARY KEY, -- Gerador automático de código
+    dsObservacao NVARCHAR(250),
+    dtRecomendacao DATE NOT NULL,
+    stRecomendacao NVARCHAR(50),
+    cdAparelho INT NOT NULL,
+    CONSTRAINT fk_tb_recomendacao_aparelho FOREIGN KEY (cdAparelho) REFERENCES tb_aparelho(cdAparelho)
+);
+
+-- Tabela de Usuários
+CREATE TABLE t_usuario (
+    cdUsuario INT IDENTITY(1,1) PRIMARY KEY,   -- Gerador automático de código
+    nmUsuario NVARCHAR(20) NOT NULL UNIQUE,
+    dsSenha NVARCHAR(100) NOT NULL
+);
+
+-- --------------------------------------
+-- ALTER TABLES - ADICIONAR COLUNAS
+-- --------------------------------------
+ALTER TABLE tb_alerta ADD dsNovoCampo NVARCHAR(100);
+ALTER TABLE tb_aparelho ADD dtUltimaManutencao DATE;
+ALTER TABLE tb_consumo ADD vlMedicao DECIMAL(10, 2);
+ALTER TABLE tb_instalacao ADD tpInstalacao NVARCHAR(20);
+ALTER TABLE tb_recomendacao ADD dsNovoStatus NVARCHAR(50);
+ALTER TABLE t_usuario ADD dtCadastro DATE;
+
+-- --------------------------------------
+-- ALTER TABLES - ALTERAR COLUNAS
+-- --------------------------------------
+ALTER TABLE tb_alerta ALTER COLUMN dsObservacao NVARCHAR(200);
+ALTER TABLE tb_aparelho ALTER COLUMN dsTipoAparelho NVARCHAR(300);
+ALTER TABLE tb_consumo ALTER COLUMN nrConsumoEnergia BIGINT;
+ALTER TABLE tb_instalacao ALTER COLUMN nmRua NVARCHAR(100);
+ALTER TABLE tb_recomendacao ALTER COLUMN stRecomendacao NVARCHAR(100);
+ALTER TABLE t_usuario ALTER COLUMN nmUsuario NVARCHAR(30);
+
+-- --------------------------------------
+-- ALTER TABLES - ADICIONAR CONSTRAINTS
+-- --------------------------------------
+ALTER TABLE tb_alerta ADD CONSTRAINT ck_stNivelPrioridade CHECK (stNivelPrioridade IN ('ALTA', 'MEDIA', 'BAIXA'));
+ALTER TABLE tb_consumo ADD CONSTRAINT ck_nrCusto CHECK (nrCusto >= 0);
+ALTER TABLE tb_aparelho ADD CONSTRAINT ck_nrWatts CHECK (nrWatts > 0);
+
+-- --------------------------------------
+-- DROP CONSTRAINTS (Remover as Foreign Keys antes de dropar as tabelas)
+-- --------------------------------------
+
+-- Remover as Foreign Keys
+ALTER TABLE tb_alerta DROP CONSTRAINT fk_tb_alerta_aparelho;
+ALTER TABLE tb_consumo DROP CONSTRAINT fk_tb_consumo_aparelho;
+ALTER TABLE tb_recomendacao DROP CONSTRAINT fk_tb_recomendacao_aparelho;
+ALTER TABLE tb_aparelho DROP CONSTRAINT fk_tb_aparelho_instalacao;
