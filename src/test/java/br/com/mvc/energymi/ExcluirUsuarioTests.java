@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class UsuarioRepositoryTests {
+public class ExcluirUsuarioTests {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -18,10 +18,14 @@ class UsuarioRepositoryTests {
     void testExcluirUsuario() {
         // Criando e salvando um usuário para teste
         Usuario usuario = new Usuario("usuarioExcluir", "senha123");
-        usuarioRepository.save(usuario);
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
+
+        // Verificando se o usuário foi salvo corretamente antes de excluir
+        assertThat(usuarioSalvo).isNotNull();
+        assertThat(usuarioSalvo.getId()).isNotNull();
 
         // Excluindo o usuário do banco
-        usuarioRepository.delete(usuario);
+        usuarioRepository.delete(usuarioSalvo);
 
         // Tentando recuperar o usuário após exclusão
         Usuario usuarioEncontrado = usuarioRepository.findByUsername("usuarioExcluir");
