@@ -9,21 +9,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class UsuarioRepositoryTests {
+public class BuscarUsuarioTests {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Test
     void testBuscarUsuarioPorUsername() {
-        // Supondo que um usuário foi previamente criado e salvo no banco
+        // Criando e salvando um novo usuário no banco de dados
         Usuario usuario = new Usuario("usuarioBusca", "senha123");
         usuarioRepository.save(usuario);
 
         // Recuperando o usuário pelo nome de usuário
         Usuario usuarioEncontrado = usuarioRepository.findByUsername("usuarioBusca");
 
-        // Verificando se o usuário foi encontrado corretamente
+        // Validando que o usuário foi encontrado e os dados estão corretos
         assertThat(usuarioEncontrado).isNotNull();
         assertThat(usuarioEncontrado.getUsername()).isEqualTo("usuarioBusca");
     }
